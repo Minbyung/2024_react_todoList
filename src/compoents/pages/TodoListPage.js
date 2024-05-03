@@ -1,7 +1,7 @@
 import { Tab, Tabs } from "@mui/material";
 import { useRecoilState } from "recoil";
 
-import { useTodosState, useTodoOptionDrawerState } from "../../hooks";
+import { useTodosState, useTodoOptionDrawerState } from  "../../hooks";
 import TodoListItem from "../TodoListItem";
 import TodoOptionDrawer from "../TodoOptionDrawer";
 import { TodoList__filterCompletedIndexAtom } from "../../atoms";
@@ -9,17 +9,29 @@ import { TodoList__filterCompletedIndexAtom } from "../../atoms";
 export default function TodoList() {
     const todosState = useTodosState();
     const todoOptionDrawerState = useTodoOptionDrawerState();
-    const onCompletedBtnClicked = (id) => todosState.toggleTodoCompletedById(id);
+    const onCompletedBtnClicked  = (id) => todosState.toggleTodoCompletedById(id);
     const [filterCompletedIndex, setFilterCompletedIndex] = useRecoilState(
         TodoList__filterCompletedIndexAtom
       );
-  
 
+    const getFilteredTodos = () => {
+        if ( filterCompletedIndex == 1 ) {
+            return todosState.todos.filter((todo) => !todo.completed);
+        }
+
+        if ( filterCompletedIndex == 2 ) {
+            return todosState.todos.filter((todo) => todo.completed);
+        }
+
+        return todosState.todos;
+    }
+
+    const filteredTodos = getFilteredTodos();
+  
     return (
       <>
         <TodoOptionDrawer state={todoOptionDrawerState} />
 
-        
         <Tabs
             variant="fullWidth"
             value={filterCompletedIndex}
@@ -53,11 +65,10 @@ export default function TodoList() {
             value={2}
             />
         </Tabs>
-        
   
         <div className='mt-4 px-4'>
           <ul>
-            {todosState.todos.map((todo, index) => (
+            {filteredTodos.map((todo, index) => (
               <TodoListItem 
                 key={todo.id}
                 todo={todo}
